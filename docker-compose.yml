@@ -1,0 +1,24 @@
+services:
+  api:
+    build: ./backend
+    env_file: .env
+    volumes:
+      - db_data:/app/data
+      - uploads_data:/app/uploads
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  uploads_data:

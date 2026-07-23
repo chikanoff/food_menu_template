@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+*.pyc
+__pycache__/
+.venv/
+backend/data/*.db
+backend/uploads/*
+!backend/uploads/.gitkeep
+.DS_Store
+*.log
+_write_*.py
+poetry.toml
+.python-version
+package-lock.json
+npm-debug.log*
+.pnpm-store/

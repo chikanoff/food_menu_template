@@ -1,0 +1,19 @@
+# deps & build artifacts
+**/node_modules
+**/dist
+**/.venv
+**/__pycache__
+**/*.pyc
+**/.git
+**/.pnpm-store
+
+# local env / data
+.env
+backend/data
+backend/uploads
+**/*.db
+
+# editor / OS
+**/.DS_Store
+**/.idea
+**/.vscode
