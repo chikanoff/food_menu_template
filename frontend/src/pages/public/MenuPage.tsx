@@ -36,6 +36,10 @@ export function MenuPage() {
     }
   }, [])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+  }, [categorySlug])
+
   const categories = useMemo(
     () => menu.map(({ dishes: _dishes, ...c }) => c),
     [menu]

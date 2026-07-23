@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useOutlet, useLocation } from "react-router-dom"
 import { AnimatePresence, motion } from "motion/react"
 import { useRestaurant } from "@/features/public-menu/RestaurantProvider"
@@ -17,6 +18,13 @@ export function PublicShell() {
   const { restaurant, loading, error } = useRestaurant()
   const location = useLocation()
   const outlet = useOutlet()
+  const isHome = location.pathname === "/"
+  const transitionKey = pageTransitionKey(location.pathname)
+
+  useEffect(() => {
+    // Prevent browser restore-scroll leaving a cream strip under the hero
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+  }, [transitionKey])
 
   if (loading) {
     return (
@@ -39,10 +47,10 @@ export function PublicShell() {
       <main className="relative flex-1">
         <AnimatePresence mode="wait">
           <motion.div
-            key={pageTransitionKey(location.pathname)}
-            initial={{ opacity: 0, y: 14 }}
+            key={transitionKey}
+            initial={{ opacity: 0, y: isHome ? 0 : 14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: isHome ? 0 : -10 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
             {outlet}

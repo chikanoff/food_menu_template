@@ -22,17 +22,22 @@ export function HomePage() {
     void api.get<Promotion[]>("/api/v1/promotions").then(setPromos).catch(() => setPromos([]))
   }, [])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+  }, [])
+
   if (!restaurant) return null
 
   return (
     <div>
-      <section className="relative isolate min-h-[92vh] overflow-hidden">
+      {/* svh = stable visible height (avoids refresh strip from dynamic browser chrome) */}
+      <section className="relative isolate -mt-[4.25rem] min-h-svh overflow-hidden pt-[4.25rem]">
         <div className="absolute inset-0">
           {restaurant.cover_url ? (
             <motion.img
               src={mediaUrl(restaurant.cover_url)}
               alt=""
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover object-center"
               initial={{ scale: 1.12 }}
               animate={{ scale: 1 }}
               transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
@@ -50,7 +55,7 @@ export function HomePage() {
           />
         </div>
 
-        <div className="relative mx-auto flex min-h-[92vh] max-w-6xl flex-col justify-end px-4 pb-20 pt-28 text-white">
+        <div className="relative mx-auto flex min-h-[calc(100svh-4.25rem)] max-w-6xl flex-col justify-end px-4 pb-16 pt-10 text-white sm:pb-20">
           <BlurFade>
             <p className="eyebrow mb-4 text-white/65">Видео-меню</p>
           </BlurFade>
