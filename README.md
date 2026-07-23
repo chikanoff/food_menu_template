@@ -6,7 +6,7 @@
 
 - Frontend: React, Vite, TypeScript, Tailwind CSS, shadcn-style UI, Motion, **pnpm**
 - Backend: FastAPI, SQLAlchemy, SQLite, **Poetry**
-- Deploy: Docker Compose + Nginx
+- Deploy: Docker Compose + Nginx на VPS
 
 ## Быстрый старт (локально)
 
@@ -35,7 +35,7 @@ pnpm dev
 
 Vite проксирует `/api` и `/media` на backend `:8000`.
 
-## Docker
+## Docker (локально)
 
 ```bash
 cp .env.example .env
@@ -44,16 +44,101 @@ docker compose up --build
 
 Откройте http://localhost
 
-Сборка: API через Poetry (`poetry install`), фронт через pnpm (`pnpm install --frozen-lockfile`).
+## Деплой на VPS (Ubuntu 24.04)
+
+Нужен пустой VPS с публичным IP. Seed демо-меню выполняется при первом старте API автоматически.
+
+### 1. Подключитесь по SSH
+
+```bash
+ssh root@YOUR_VPS_IP
+```
+
+### 2. Установите Docker
+
+```bash
+apt-get update
+apt-get install -y ca-certificates curl git
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+systemctl enable --now docker
+```
+
+### 3. Клонируйте проект
+
+```bash
+mkdir -p /opt && cd /opt
+git clone https://github.com/chikanoff/food_menu_template.git videomenu
+cd videomenu
+```
+
+### 4. Настройте `.env`
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Обязательно замените:
+
+```
+SECRET_KEY=<длинная-случайная-строка>
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=<надёжный-пароль>
+CORS_ORIGINS=http://YOUR_VPS_IP
+PUBLIC_BASE_URL=http://YOUR_VPS_IP
+```
+
+Если уже есть домен:
+
+```
+CORS_ORIGINS=https://menu.example.com
+PUBLIC_BASE_URL=https://menu.example.com
+```
+
+### 5. Откройте порт 80 (если ufw включён)
+
+```bash
+ufw allow OpenSSH
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw --force enable
+```
+
+### 6. Запустите
+
+```bash
+docker compose up -d --build
+docker compose ps
+curl -s http://127.0.0.1/api/v1/health
+```
+
+Откройте в браузере: `http://YOUR_VPS_IP`  
+Админка: `http://YOUR_VPS_IP/admin`
+
+### 7. Обновление
+
+```bash
+cd /opt/videomenu
+git pull
+docker compose up -d --build
+```
+
+### HTTPS (по желанию)
+
+Проще всего поставить Caddy перед контейнерами или пробросить 443. Для демо по IP достаточно HTTP.
 
 ## Клонирование под новый ресторан
 
-1. Скопируйте репозиторий / папку проекта.
-2. Задайте в `.env`: `SECRET_KEY`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`, домен в `CORS_ORIGINS` и `PUBLIC_BASE_URL`.
-3. Поднимите `docker compose up -d --build`.
-4. Войдите в `/admin`, замените название, цвета, логотип, контакты.
-5. Создайте категории и блюда, загрузите фото/видео.
-6. Сгенерируйте QR на публичный URL сайта.
+1. Новый VPS или отдельная папка/compose-проект.
+2. Свой `.env` (секрет, пароль, домен/IP).
+3. `docker compose up -d --build`.
+4. В `/admin` заменить бренд, цвета, меню.
+5. QR на публичный URL.
 
 ## Рекомендации по видео
 
@@ -65,51 +150,24 @@ docker compose up --build
 
 ## Backup
 
-Сохраняйте volume с SQLite (`db_data`) и `uploads_data`.
+```bash
+docker compose exec api ls /app/data /app/uploads
+# volumes: db_data, uploads_data
+docker run --rm -v videomenu_db_data:/data -v $(pwd):/backup alpine tar czf /backup/db-backup.tgz -C /data .
+docker run --rm -v videomenu_uploads_data:/data -v $(pwd):/backup alpine tar czf /backup/uploads-backup.tgz -C /data .
+```
+
+Имена volume могут отличаться (`docker volume ls`).
 
 ## Структура API (кратко)
 
-- Public: `GET /api/v1/restaurant|categories|dishes|promotions`
+- Public: `GET /api/v1/restaurant|categories|dishes|promotions|menu`
 - Admin: JWT login + CRUD категорий/блюд/медиа/акций/настроек + `POST /api/v1/admin/upload`
 
 ## Prod checklist
 
 - [ ] Сменить `SECRET_KEY` и пароль админа
-- [ ] Настроить HTTPS (Caddy/Nginx перед compose)
+- [ ] Прописать IP/домен в `CORS_ORIGINS` и `PUBLIC_BASE_URL`
+- [ ] Открыть порт 80 (и 443 при HTTPS)
 - [ ] Бэкап SQLite + uploads
-- [ ] Проверить лимиты upload и размеры видео
 - [ ] Проверить сайт на телефоне по QR
-
-## Деплой на Railway (демо)
-
-Railway по умолчанию использует Railpack и не понимает monorepo. В корне есть единый `Dockerfile` и `railway.toml` (builder = DOCKERFILE): фронт + API + nginx в одном сервисе.
-
-1. Запушьте репозиторий на GitHub.
-2. [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
-3. В Settings сервиса проверьте:
-   - Builder = **Dockerfile**
-   - Dockerfile path = `Dockerfile`
-4. Variables:
-
-```
-SECRET_KEY=<длинная-случайная-строка>
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=<надёжный-пароль>
-DATABASE_URL=sqlite:////app/data/videomenu.db
-MEDIA_ROOT=/app/uploads
-CORS_ORIGINS=https://<ваш-домен>.up.railway.app
-PUBLIC_BASE_URL=https://<ваш-домен>.up.railway.app
-```
-
-5. **Networking → Generate Domain**.
-6. Volume:
-   - `/app/data`
-   - `/app/uploads`
-7. Откройте домен → `/admin`.
-
-Если снова выбирается Railpack: Settings → Build → Builder → **Dockerfile**, Redeploy.
-
-Локально: `docker compose up --build`. Для Railway demo удобнее один контейнер из корневого `Dockerfile`.
-
-> SQLite + volume ок для демо. Позже `DATABASE_URL` можно сменить на Postgres.
-

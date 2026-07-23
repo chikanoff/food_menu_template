@@ -22,9 +22,9 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     environment:
-      PORT: ${PORT:-80}
+      PORT: "80"
     ports:
-      - "${PORT:-80}:${PORT:-80}"
+      - "80:80"
     depends_on:
       api:
         condition: service_healthy
