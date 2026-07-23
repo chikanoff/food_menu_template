@@ -5,6 +5,10 @@ export PORT="${PORT:-8080}"
 
 envsubst '${PORT}' < /etc/nginx/nginx.railway.conf.template > /etc/nginx/conf.d/default.conf
 
+echo "[boot] Running database seed..."
+python -m app.seed
+
+echo "[boot] Starting API..."
 uvicorn app.main:app --host 127.0.0.1 --port 8000 &
 API_PID=$!
 
@@ -15,6 +19,7 @@ for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
   sleep 0.5
 done
 
+echo "[boot] Starting nginx on PORT=${PORT}..."
 nginx -g 'daemon off;' &
 NGINX_PID=$!
 

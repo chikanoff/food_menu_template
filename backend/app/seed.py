@@ -184,3 +184,21 @@ def seed_if_empty(db: Session) -> None:
         )
 
     db.commit()
+
+
+def main() -> None:
+    """Idempotent bootstrap for first deploy / demo."""
+    init_db()
+    from app.db import SessionLocal
+
+    db = SessionLocal()
+    try:
+        seed_if_empty(db)
+        print("Seed complete: demo restaurant/menu ready (skipped if already filled).")
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    main()
+
