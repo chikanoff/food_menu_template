@@ -82,10 +82,14 @@ docker compose up --build
 
 ## Деплой на Railway (демо)
 
-1. Залейте репозиторий на GitHub (если ещё не заливали).
-2. На [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
-3. Выберите этот репозиторий. Если Railway предложит **Docker Compose** — включите (файл `docker-compose.yml` в корне).
-4. В сервисе **api** задайте Variables:
+Railway по умолчанию использует Railpack и не понимает monorepo. В корне есть единый `Dockerfile` и `railway.toml` (builder = DOCKERFILE): фронт + API + nginx в одном сервисе.
+
+1. Запушьте репозиторий на GitHub.
+2. [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
+3. В Settings сервиса проверьте:
+   - Builder = **Dockerfile**
+   - Dockerfile path = `Dockerfile`
+4. Variables:
 
 ```
 SECRET_KEY=<длинная-случайная-строка>
@@ -97,22 +101,15 @@ CORS_ORIGINS=https://<ваш-домен>.up.railway.app
 PUBLIC_BASE_URL=https://<ваш-домен>.up.railway.app
 ```
 
-5. У сервиса **web** включите **Public Networking** (Generate Domain) — это публичный URL демо.
-6. Для **api** Public Networking **не нужен** (nginx проксирует `/api` и `/media` внутри сети).
-7. На **api** добавьте Volume(s):
-   - mount `/app/data` (SQLite)
-   - mount `/app/uploads` (фото/видео)
-8. Дождитесь деплоя → откройте домен web → `/admin` с логином/паролем из Variables.
+5. **Networking → Generate Domain**.
+6. Volume:
+   - `/app/data`
+   - `/app/uploads`
+7. Откройте домен → `/admin`.
 
-### CLI (альтернатива)
+Если снова выбирается Railpack: Settings → Build → Builder → **Dockerfile**, Redeploy.
 
-```bash
-npm i -g @railway/cli
-railway login
-railway init
-railway up
-```
+Локально: `docker compose up --build`. Для Railway demo удобнее один контейнер из корневого `Dockerfile`.
 
-После первого деплоя в Dashboard привяжите домен к **web** и пропишите его в `CORS_ORIGINS` / `PUBLIC_BASE_URL`.
+> SQLite + volume ок для демо. Позже `DATABASE_URL` можно сменить на Postgres.
 
-> SQLite + volumes на Railway ок для демо одного заведения. Для серьёзного продакшена позже можно сменить `DATABASE_URL` на Postgres без смены архитектуры продукта.
