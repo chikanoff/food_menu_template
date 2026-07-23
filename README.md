@@ -79,3 +79,40 @@ docker compose up --build
 - [ ] Бэкап SQLite + uploads
 - [ ] Проверить лимиты upload и размеры видео
 - [ ] Проверить сайт на телефоне по QR
+
+## Деплой на Railway (демо)
+
+1. Залейте репозиторий на GitHub (если ещё не заливали).
+2. На [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
+3. Выберите этот репозиторий. Если Railway предложит **Docker Compose** — включите (файл `docker-compose.yml` в корне).
+4. В сервисе **api** задайте Variables:
+
+```
+SECRET_KEY=<длинная-случайная-строка>
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=<надёжный-пароль>
+DATABASE_URL=sqlite:////app/data/videomenu.db
+MEDIA_ROOT=/app/uploads
+CORS_ORIGINS=https://<ваш-домен>.up.railway.app
+PUBLIC_BASE_URL=https://<ваш-домен>.up.railway.app
+```
+
+5. У сервиса **web** включите **Public Networking** (Generate Domain) — это публичный URL демо.
+6. Для **api** Public Networking **не нужен** (nginx проксирует `/api` и `/media` внутри сети).
+7. На **api** добавьте Volume(s):
+   - mount `/app/data` (SQLite)
+   - mount `/app/uploads` (фото/видео)
+8. Дождитесь деплоя → откройте домен web → `/admin` с логином/паролем из Variables.
+
+### CLI (альтернатива)
+
+```bash
+npm i -g @railway/cli
+railway login
+railway init
+railway up
+```
+
+После первого деплоя в Dashboard привяжите домен к **web** и пропишите его в `CORS_ORIGINS` / `PUBLIC_BASE_URL`.
+
+> SQLite + volumes на Railway ок для демо одного заведения. Для серьёзного продакшена позже можно сменить `DATABASE_URL` на Postgres без смены архитектуры продукта.

@@ -2,21 +2,32 @@ services:
   api:
     build: ./backend
     env_file: .env
+    environment:
+      DATABASE_URL: sqlite:////app/data/videomenu.db
+      MEDIA_ROOT: /app/uploads
     volumes:
       - db_data:/app/data
       - uploads_data:/app/uploads
     expose:
       - "8000"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   web:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+    environment:
+      PORT: ${PORT:-80}
     ports:
-      - "80:80"
+      - "${PORT:-80}:${PORT:-80}"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
