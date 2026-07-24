@@ -15,7 +15,7 @@ const links = [
 export function SiteHeader({ restaurant }: { restaurant: Restaurant }) {
   const [open, setOpen] = useState(false)
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#1a1612]/55 text-[#f7f2ea] backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#1a1612]/80 text-[#f7f2ea] backdrop-blur-md">
       <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between px-4">
         <Link to="/" className="group flex items-center gap-3">
           {restaurant.logo_url ? (

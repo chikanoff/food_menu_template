@@ -4,9 +4,14 @@ import type { Dish } from "@/types"
 import { formatPrice, cn } from "@/lib/utils"
 import { getDishCover } from "@/lib/media"
 import { SpotlightCard } from "@/components/magic/spotlight-card"
+import { CardVideoPreview } from "@/components/menu/CardVideoPreview"
 
+/**
+ * List card. Videos here are ONLY the lightweight transcoded previews
+ * (CardVideoPreview caps concurrency + unmounts off-screen) — never raw uploads.
+ */
 export function DishCard({ dish, index = 0 }: { dish: Dish; index?: number }) {
-  const { src, hasVideo } = getDishCover(dish)
+  const { src, hasVideo, previewSrc } = getDishCover(dish)
 
   return (
     <article
@@ -19,7 +24,9 @@ export function DishCard({ dish, index = 0 }: { dish: Dish; index?: number }) {
       <Link to={`/dish/${dish.slug}`} className="block">
         <SpotlightCard className="h-full">
           <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-            {src ? (
+            {src && previewSrc ? (
+              <CardVideoPreview src={previewSrc} poster={src} alt={dish.name} eager={index < 4} />
+            ) : src ? (
               <img
                 src={src}
                 alt={dish.name}
@@ -36,7 +43,8 @@ export function DishCard({ dish, index = 0 }: { dish: Dish; index?: number }) {
               <span
                 className={cn(
                   "absolute right-3 top-3 inline-flex items-center gap-1 rounded-full",
-                  "bg-black/45 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm ring-1 ring-white/20"
+                  // no backdrop-blur over <video>: it re-blurs on every video frame
+                  "bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white ring-1 ring-white/20"
                 )}
               >
                 <Play className="h-3 w-3 fill-current" />
@@ -48,7 +56,7 @@ export function DishCard({ dish, index = 0 }: { dish: Dish; index?: number }) {
             <div className="absolute inset-x-0 bottom-0 space-y-1 p-4 text-white">
               <div className="flex items-end justify-between gap-3">
                 <h3 className="font-display text-2xl leading-tight tracking-tight">{dish.name}</h3>
-                <p className="shrink-0 rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur-md ring-1 ring-white/20">
+                <p className="shrink-0 rounded-full bg-[#1a1612]/50 px-3 py-1 text-xs font-medium ring-1 ring-white/20">
                   {formatPrice(dish.price, dish.currency)}
                 </p>
               </div>

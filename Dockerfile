@@ -20,7 +20,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     MEDIA_ROOT=/app/uploads
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends nginx gettext-base curl \
+    && apt-get install -y --no-install-recommends nginx gettext-base curl ffmpeg \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir "poetry==${POETRY_VERSION}" \
     && rm -f /etc/nginx/sites-enabled/default

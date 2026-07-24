@@ -160,6 +160,7 @@ def delete_category(
         for media in dish.media:
             media_storage.delete(media.url)
             media_storage.delete(media.poster_url)
+            media_storage.delete(media.preview_url)
     db.delete(category)
     db.commit()
 
@@ -255,6 +256,7 @@ def delete_dish(
     for media in dish.media:
         media_storage.delete(media.url)
         media_storage.delete(media.poster_url)
+        media_storage.delete(media.preview_url)
     db.delete(dish)
     db.commit()
 
@@ -327,6 +329,7 @@ def delete_media(
         raise HTTPException(status_code=404, detail="Not found")
     media_storage.delete(media.url)
     media_storage.delete(media.poster_url)
+    media_storage.delete(media.preview_url)
     db.delete(media)
     db.commit()
 
@@ -391,5 +394,11 @@ async def upload_file(
     _: Annotated[Admin, Depends(get_current_admin)],
     file: UploadFile = File(...),
 ) -> UploadOut:
-    url, content_type, size = await media_storage.save(file)
-    return UploadOut(url=url, content_type=content_type, size=size)
+    result = await media_storage.save(file)
+    return UploadOut(
+        url=result.url,
+        content_type=result.content_type,
+        size=result.size,
+        poster_url=result.poster_url,
+        preview_url=result.preview_url,
+    )

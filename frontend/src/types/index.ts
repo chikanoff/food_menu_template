@@ -23,6 +23,7 @@ export interface DishMedia {
   type: "photo" | "video" | string
   url: string
   poster_url: string | null
+  preview_url: string | null
   sort_order: number
   is_primary: boolean
 }

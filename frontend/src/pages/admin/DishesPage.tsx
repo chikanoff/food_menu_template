@@ -46,6 +46,8 @@ export function DishesPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [mediaUrl, setMediaUrl] = useState("")
   const [mediaType, setMediaType] = useState<"photo" | "video">("photo")
+  const [mediaPoster, setMediaPoster] = useState<string | null>(null)
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null)
 
   const load = async () => {
     const cats = await api.get<Category[]>("/api/v1/admin/categories")
@@ -86,10 +88,15 @@ export function DishesPage() {
   const upload = async (file: File) => {
     const body = new FormData()
     body.append("file", file)
-    const res = await api.post<{ url: string }>("/api/v1/admin/upload", body)
+    const res = await api.post<{ url: string; poster_url: string | null; preview_url: string | null }>(
+      "/api/v1/admin/upload",
+      body
+    )
     setMediaUrl(res.url)
+    setMediaPoster(res.poster_url ?? null)
+    setMediaPreview(res.preview_url ?? null)
     setMediaType(file.type.startsWith("video/") ? "video" : "photo")
-    toast.success("Файл загружен")
+    toast.success("Файл загружен и оптимизирован")
   }
 
   const attachMedia = async () => {
@@ -97,11 +104,15 @@ export function DishesPage() {
     await api.post(`/api/v1/admin/dishes/${editingId}/media`, {
       type: mediaType,
       url: mediaUrl,
+      poster_url: mediaPoster,
+      preview_url: mediaPreview,
       is_primary: true,
       sort_order: 0,
     })
     toast.success("Медиа добавлено")
     setMediaUrl("")
+    setMediaPoster(null)
+    setMediaPreview(null)
     await load()
   }
 
@@ -156,7 +167,16 @@ export function DishesPage() {
               <h3 className="font-medium">Медиа</h3>
               <Input type="file" accept="image/*,video/mp4,video/webm" onChange={(e) => e.target.files?.[0] && void upload(e.target.files[0])} />
               <div className="flex gap-2">
-                <Input placeholder="URL медиа" value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} />
+                <Input
+                  placeholder="URL медиа"
+                  value={mediaUrl}
+                  onChange={(e) => {
+                    setMediaUrl(e.target.value)
+                    // Ручной URL не связан с результатами последней загрузки
+                    setMediaPoster(null)
+                    setMediaPreview(null)
+                  }}
+                />
                 <Button type="button" onClick={() => void attachMedia()}>Добавить</Button>
               </div>
               <div className="space-y-2">

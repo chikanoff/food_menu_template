@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 
 export function CategoryNav({ categories, activeSlug }: { categories: Category[]; activeSlug?: string }) {
   return (
-    <div className="sticky top-[4.25rem] z-30 -mx-4 overflow-x-auto border-b border-border/50 bg-background/70 px-4 py-3 backdrop-blur-xl">
+    <div className="sticky top-[4.25rem] z-30 -mx-4 overflow-x-auto border-b border-border/50 bg-background/90 px-4 py-3 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl gap-2">
         {[
           { slug: undefined as string | undefined, name: "Все", to: "/menu" },

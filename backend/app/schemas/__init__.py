@@ -53,6 +53,7 @@ class DishMediaOut(OrmModel):
     type: str
     url: str
     poster_url: str | None
+    preview_url: str | None
     sort_order: int
     is_primary: bool
 
@@ -61,6 +62,7 @@ class DishMediaCreate(BaseModel):
     type: str = Field(pattern="^(photo|video)$")
     url: str
     poster_url: str | None = None
+    preview_url: str | None = None
     sort_order: int = 0
     is_primary: bool = False
 
@@ -69,6 +71,7 @@ class DishMediaUpdate(BaseModel):
     sort_order: int | None = None
     is_primary: bool | None = None
     poster_url: str | None = None
+    preview_url: str | None = None
 
 
 # --- Dish ---
@@ -216,6 +219,8 @@ class UploadOut(BaseModel):
     url: str
     content_type: str
     size: int
+    poster_url: str | None = None
+    preview_url: str | None = None
 
 
 class DashboardStats(BaseModel):

@@ -1,3 +1,4 @@
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -16,6 +17,16 @@ def init_db() -> None:
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
     Base.metadata.create_all(bind=engine)
+    _ensure_new_columns()
+
+
+def _ensure_new_columns() -> None:
+    """create_all does not alter existing tables — add columns introduced later."""
+    inspector = inspect(engine)
+    columns = {c["name"] for c in inspector.get_columns("dish_media")}
+    if "preview_url" not in columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE dish_media ADD COLUMN preview_url VARCHAR(500)"))
 
 
 def seed_if_empty(db: Session) -> None:

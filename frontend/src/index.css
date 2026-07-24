@@ -27,26 +27,28 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   font-optical-sizing: auto;
+  /* no background-attachment: fixed — it forces a full repaint every scroll frame on mobile */
   background:
     radial-gradient(1200px 700px at 12% -10%, color-mix(in oklab, var(--color-accent) 28%, transparent), transparent 55%),
     radial-gradient(900px 600px at 92% 8%, color-mix(in oklab, #8b7355 18%, transparent), transparent 50%),
-    radial-gradient(800px 500px at 50% 100%, color-mix(in oklab, #1a1612 8%, transparent), transparent 55%),
     linear-gradient(180deg, #f7f2ea 0%, var(--color-background) 40%, #efe7db 100%);
-  background-attachment: fixed;
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-body::before {
-  content: "";
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode: multiply;
+/* Film-grain overlay only on desktop. No mix-blend-mode: a blend layer over
+   playing <video> forces full-screen recompositing on every video frame. */
+@media (min-width: 1024px) {
+  body::before {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 }
 
 h1, h2, h3, .font-display {

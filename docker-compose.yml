@@ -24,6 +24,8 @@ services:
       dockerfile: Dockerfile.frontend
     environment:
       PORT: "80"
+    volumes:
+      - uploads_data:/srv/media:ro
     ports:
       - "80:80"
     depends_on:

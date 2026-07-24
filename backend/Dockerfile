@@ -9,7 +9,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     POETRY_NO_INTERACTION=1 \
     POETRY_REQUESTS_TIMEOUT=120
 
-RUN pip install --no-cache-dir "poetry==${POETRY_VERSION}"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir "poetry==${POETRY_VERSION}"
 
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --only main --no-root --no-ansi

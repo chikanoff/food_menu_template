@@ -83,6 +83,7 @@ class DishMedia(Base):
     type: Mapped[str] = mapped_column(String(20))  # photo | video
     url: Mapped[str] = mapped_column(String(500))
     poster_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    preview_url: Mapped[str | None] = mapped_column(String(500), nullable=True)  # lightweight loop for cards
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
     is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
 
