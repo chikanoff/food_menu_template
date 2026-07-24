@@ -140,13 +140,20 @@ docker compose up -d --build
 4. В `/admin` заменить бренд, цвета, меню.
 5. QR на публичный URL.
 
+## Производительность (карточки меню)
+
+- В сетке меню **нет `<video>`**: только poster/фото + бейдж «Видео».
+- Видео грузится **на странице блюда**, лениво (IntersectionObserver), `preload="none/metadata"`.
+- На Save-Data / 2G / reduced-motion автоплей отключён.
+- Картинки: `loading="lazy"`, `decoding="async"`, `content-visibility` на карточках.
+
 ## Рекомендации по видео
 
 - Формат: MP4 (H.264) или WebM, вертикаль 9:16 или 4:5.
-- Длительность: 5–15 секунд, без звука (autoplay muted).
-- Размер: до 40 MB (лимит `MAX_VIDEO_MB`), лучше 5–15 MB.
-- HandBrake preset: Social / Web → Fast 720p30, bitrate ~2–4 Mbps.
-- Всегда добавляйте poster (кадр-обложку).
+- Длительность: 5–15 секунд, без звука.
+- Размер: до 40 MB (лимит `MAX_VIDEO_MB`), лучше **2–8 MB**.
+- HandBrake: Social / Web → Fast 720p30, bitrate ~1.5–3 Mbps.
+- **Обязателен poster** (кадр-обложка) — без него в меню будет пустая заглушка.
 
 ## Backup
 

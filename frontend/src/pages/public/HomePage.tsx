@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { ArrowRight } from "lucide-react"
-import { motion } from "motion/react"
 import { api } from "@/lib/api"
 import type { Dish, Promotion } from "@/types"
 import { useRestaurant } from "@/features/public-menu/RestaurantProvider"
@@ -34,25 +33,19 @@ export function HomePage() {
       <section className="relative isolate -mt-[4.25rem] min-h-svh overflow-hidden pt-[4.25rem]">
         <div className="absolute inset-0">
           {restaurant.cover_url ? (
-            <motion.img
+            <img
               src={mediaUrl(restaurant.cover_url)}
               alt=""
               className="h-full w-full object-cover object-center"
-              initial={{ scale: 1.12 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+              fetchPriority="high"
+              decoding="async"
             />
           ) : (
             <div className="h-full w-full bg-[radial-gradient(circle_at_18%_20%,color-mix(in_oklab,var(--color-accent)_40%,transparent),transparent_42%),radial-gradient(circle_at_85%_15%,rgba(255,255,255,0.12),transparent_35%),linear-gradient(165deg,#1a1612_0%,#2c2620_48%,#171310_100%)]" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#1a1612] via-[#1a1612]/60 to-[#1a1612]/20" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(26,22,18,0.45)_100%)]" />
-          <motion.div
-            aria-hidden
-            className="absolute -left-10 top-1/4 h-64 w-64 rounded-full bg-accent/25 blur-3xl"
-            animate={{ opacity: [0.35, 0.7, 0.35], scale: [1, 1.15, 1] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
+          <div aria-hidden className="absolute -left-10 top-1/4 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
         </div>
 
         <div className="relative mx-auto flex min-h-[calc(100svh-4.25rem)] max-w-6xl flex-col justify-end px-4 pb-16 pt-10 text-white sm:pb-20">

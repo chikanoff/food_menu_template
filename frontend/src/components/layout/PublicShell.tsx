@@ -48,10 +48,10 @@ export function PublicShell() {
         <AnimatePresence mode="wait">
           <motion.div
             key={transitionKey}
-            initial={{ opacity: 0, y: isHome ? 0 : 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: isHome ? 0 : -10 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: isHome ? 0.2 : 0.25, ease: "easeOut" }}
           >
             {outlet}
           </motion.div>
